@@ -15,6 +15,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId } });
     if (!tournament) return NextResponse.json({ success: false, message: "Tournament not found" }, { status: 404 });
 
+    if (tournament.status === "COMPLETED"){
+      return NextResponse.json({ success: false, message: "Tournament completed" }, { status: 400 });
+    }
+
     const question = await prisma.question.findUnique({ 
       where: { id: questionId },
       include: { options: true }
