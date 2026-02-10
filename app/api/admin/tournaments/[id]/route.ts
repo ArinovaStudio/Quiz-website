@@ -41,6 +41,8 @@ const updateTournamentSchema = z.object({
   entryFee: z.number().min(0).optional(),
   prizePool: z.number().min(0).optional(),
   totalQuestions: z.number().min(1).optional(),
+  totalSeats: z.number().min(2).optional(),
+  winningSeats: z.number().min(0).optional(),
   status: z.enum(["DRAFT", "PUBLISHED", "LIVE", "COMPLETED"]).optional(),
 });
 
@@ -75,6 +77,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (!currentTournament) {
       return NextResponse.json({ success: false, message: "Tournament not found" }, { status: 404 });
+    }
+
+    const finalTotalSeats = data.totalSeats ?? currentTournament.totalSeats;
+    const finalWinningSeats = data.winningSeats ?? currentTournament.winningSeats;
+
+    if (finalWinningSeats >= finalTotalSeats) {
+        return NextResponse.json({ success: false, message: `Winning seats (${finalWinningSeats}) must be less than Total seats (${finalTotalSeats})` }, { status: 400 });
     }
 
     if (data.totalQuestions && data.totalQuestions !== currentTournament.questions.length) {
@@ -124,6 +133,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         prizePool: data.prizePool,
         status: data.status,
         totalQuestions: data.totalQuestions,
+        totalSeats: data.totalSeats,
+        winningSeats: data.winningSeats,
       },
     });
 

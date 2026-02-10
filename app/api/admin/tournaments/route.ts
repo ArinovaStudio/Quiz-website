@@ -30,6 +30,8 @@ const tournamentSchema = z.object({
   difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
   entryFee: z.number().min(0),
   prizePool: z.number().min(0),
+  totalSeats: z.number().min(2, "Must have at least 2 seats"),
+  winningSeats: z.number().min(0, "Cannot be negative"),
 });
 
 export async function POST(req: NextRequest) {
@@ -48,8 +50,17 @@ export async function POST(req: NextRequest) {
 
     const data = validation.data;
 
+    const checkTitle = await prisma.tournament.findFirst({ where: { title: data.title } });
+    if (checkTitle) {
+      return NextResponse.json({ success: false, message: "Tournament with this title already exists" }, { status: 409 });
+    }
+
     if (data.windowOpenTime >= data.startTime) {
       return NextResponse.json({ success: false, message: "Window Open Time must be BEFORE Start Time" }, { status: 400 });
+    }
+
+    if (data.winningSeats >= data.totalSeats) {
+       return NextResponse.json({ success: false, message: "Winning seats must be less than Total seats" }, { status: 400 });
     }
 
     let generatedQuestions;
@@ -77,7 +88,9 @@ export async function POST(req: NextRequest) {
         difficulty: data.difficulty,
         entryFee: data.entryFee,
         prizePool: data.prizePool,
-        status: "PUBLISHED",
+        totalSeats: data.totalSeats,
+        winningSeats: data.winningSeats,
+        status: "DRAFT",
         questions: {
           create: generatedQuestions.map((q: any) => ({
             text: q.text,

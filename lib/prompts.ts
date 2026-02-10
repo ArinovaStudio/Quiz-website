@@ -41,3 +41,14 @@ export const GenerateQuizPrompt = (
     ]
   `;
 };
+
+export const GenerateBotNamesPrompt = (count: number) => {
+  return `
+    Generate ${count} unique and realistic **Indian** names with last names.
+    
+    Requirements:
+    - Strictly return a JSON array of strings.
+    - No markdown formatting.
+    - No numbering (1. Name), just the raw strings in an array.
+  `;
+};

@@ -50,6 +50,20 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  events: {
+    async createUser({ user }) {
+      try {
+        await prisma.wallet.create({
+          data: {
+            userId: user.id,
+            balance: 0,
+          },
+        });
+      } catch (error) {
+        console.error("Error creating wallet for OAuth user:", error);
+      }
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

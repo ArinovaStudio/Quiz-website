@@ -24,7 +24,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts Account[] 
+  accounts Account[]
+  wallet Wallet?
+  responses UserResponse[]
+  registration Registration[]
 }
 
 model Account {
@@ -44,6 +47,45 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+model Wallet {
+  id String @id @default(uuid())
+  userId String @unique
+  balance Int @default(0)
+  
+  user User @relation(fields: [userId], references: [id])
+  transactions TransactionHistory[] 
+  tokenLogs TokenHistory[] 
+}
+
+model TransactionHistory {
+  id String @id @default(uuid())
+  walletId String
+  paymentId String
+  amount Float
+  tokens Int
+  status String
+  createdAt DateTime @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+}
+
+enum TokenHistoryType {
+  DEPOSIT
+  ENTRY_FEE
+  WINNINGS
+}
+
+model TokenHistory {
+  id String @id @default(uuid())
+  walletId String
+  amount Int
+  type String
+  description String?
+  createdAt DateTime @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
 }
 
 enum TournamentStatus {
@@ -70,14 +112,18 @@ model Tournament {
   durationPerQ Int
   totalQuestions Int
   difficulty Difficulty
-  status TournamentStatus @default(PUBLISHED)
+  status TournamentStatus @default(DRAFT)
 
+  totalSeats Int
+  winningSeats Int
   entryFee Float
   prizePool Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   questions Question[]
+  registration Registration[]
+  bots Bots[]
 }
 
 model Question {
@@ -88,6 +134,7 @@ model Question {
   tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   
   options Option[]
+  responses UserResponse[]
 }
 
 model Option {
@@ -97,4 +144,48 @@ model Option {
   isCorrect Boolean @default(false)
   
   question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  responses UserResponse[]
+}
+
+model UserResponse {
+  id String @id @default(uuid())
+  userId String
+  questionId String
+  optionId String
+  isCorrect Boolean
+  timeTaken Float
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, questionId])
+}
+
+model Registration {
+  id String @id @default(uuid())
+  userId String
+  tournamentId String
+  score Int @default(0)  
+  totalTime Float @default(0)
+  rank Int?
+  hasPaid Boolean @default(false)  
+  createdAt DateTime @default(now())   
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tournamentId])
+}
+
+model Bots {
+  id String @id @default(uuid())
+  tournamentId String
+  name String
+  score Int
+  timeTaken Float
+  rank Int
+  
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
 }
