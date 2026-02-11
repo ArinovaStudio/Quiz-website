@@ -6,7 +6,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const userId = await checkUser();
     if (!userId) {
-      return NextResponse.json({ success: false, message: "User not found" }, { status: 401 });
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
     const { id: tournamentId } = await params;
