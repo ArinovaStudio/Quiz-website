@@ -212,3 +212,11 @@ model Bots {
   
   tournament Tournament @relation(fields: [tournamentId], references: [id])
 }
+
+model Otp {
+  id String @id @default(uuid())
+  email String @unique
+  code String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
