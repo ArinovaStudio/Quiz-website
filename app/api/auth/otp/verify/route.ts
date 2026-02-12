@@ -36,8 +36,6 @@ export async function POST(req: NextRequest) {
 
     await prisma.otp.delete({ where: { email } });
 
-    await prisma.user.update({ where: { email }, data: { emailVerified: new Date() } });
-
     return NextResponse.json({ success: true, message: "Email Verified Successfully" }, { status: 200 });
 
   } catch {
