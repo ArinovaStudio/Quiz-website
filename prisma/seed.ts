@@ -35,9 +35,9 @@ async function main() {
   });
 
   // 3️⃣ Create 15 Tournaments
-  for (let i = 1; i <= 15; i++) {
-    const startTime = new Date(Date.now() + i * 60 * 60 * 1000);
-    const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 10000);
+  for (let i = 1; i <= 100; i++) {
+    const startTime = new Date(Date.now() + i * 60 * 60 * 10000);
+    const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 900000000);
 
     const tournament = await prisma.tournament.create({
       data: {

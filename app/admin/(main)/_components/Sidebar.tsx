@@ -39,7 +39,7 @@ export default function Sidebar({open,setOpen}:any) {
     .find((item) => pathname.startsWith(item.href));
 
   const handleLogout = async () => {
-    await signOut({ redirect: true, callbackUrl: "/" });
+    await signOut({ redirect: true, callbackUrl: "/admin/login" });
   };
 
   const SidebarContent = () => (
