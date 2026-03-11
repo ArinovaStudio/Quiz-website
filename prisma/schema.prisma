@@ -95,12 +95,13 @@ model Plan{
   updatedAt DateTime @updatedAt
 }
 
-enum TRANSACTION_STATUS{
+enum TRANSACTION_STATUS {
 PENDING
 DONE
 CANCELLED
 }
-enum PAYMENT_TYPE{
+
+enum PAYMENT_TYPE {
   CREDIT
   DEBIT
 }
@@ -227,7 +228,7 @@ model UserResponse {
   
   @@unique([userId, questionId])
 }
-enum REGISTRATION_STATUS{
+enum REGISTRATION_STATUS {
   NOT_PLAYED
   PLAYED
 }

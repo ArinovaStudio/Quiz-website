@@ -1,86 +1,123 @@
-import {  Difficulty } from "@prisma/client";
-import {prisma} from "@/lib/prisma";
-function getRandomDifficulty(): Difficulty {
-  const difficulties = [
-    Difficulty.EASY,
-    Difficulty.MEDIUM,
-    Difficulty.HARD,
-  ];
-  return difficulties[Math.floor(Math.random() * difficulties.length)];
-}
+import { Role } from "@prisma/client";
+import { seedData } from "./seedData";
+import { prisma } from "../lib/prisma";
+import bcrypt from "bcryptjs";
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log("Starting Database Seeding...");
 
-  // Optional clean (dev only)
-  // await prisma.option.deleteMany();
-  // await prisma.question.deleteMany();
-  // await prisma.tournament.deleteMany();
-  // await prisma.subCategory.deleteMany();
-  // await prisma.category.deleteMany();
+  console.log("Wiping database clean...");
+  
+  await prisma.option.deleteMany();
+  await prisma.question.deleteMany();
+  await prisma.userResponse.deleteMany();
+  await prisma.registration.deleteMany();
+  await prisma.bots.deleteMany();
+  
+  await prisma.tournament.deleteMany();
+  await prisma.subCategory.deleteMany();
+  await prisma.category.deleteMany();
+  
+  await prisma.tokenHistory.deleteMany();
+  await prisma.transactionHistory.deleteMany();
+  await prisma.wallet.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.user.deleteMany();
+  
+  await prisma.plan.deleteMany();
+  await prisma.otp.deleteMany();
+  await prisma.logTraffic.deleteMany();
+  await prisma.banner.deleteMany();
 
-  // 1️⃣ Create Category
-  const category = await prisma.category.create({
-    data: {
-      name: "General Knowledge",
-    },
-  });
+  console.log("Database cleared successfully!\n");
 
-  // 2️⃣ Create SubCategory
-  const subCategory = await prisma.subCategory.create({
-    data: {
-      name: "Mixed Trivia",
-      categoryId: category.id,
-    },
-  });
+  console.log("Seeding Users...");
 
-  // 3️⃣ Create 15 Tournaments
-  for (let i = 1; i <= 100; i++) {
-    const startTime = new Date(Date.now() + i * 60 * 60 * 10000);
-    const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 900000000);
+  const password = await bcrypt.hash('password123', 12);
 
-    const tournament = await prisma.tournament.create({
-      data: {
-        title: `Trivia Tournament ${i}`,
-        description: `Exciting trivia challenge number ${i}`,
-        categoryId: category.id,
-        subCategoryId: subCategory.id,
-        startTime,
-        windowOpenTime: new Date(),
-        endTime,
-        durationPerQ: 30,
-        totalQuestions: 5,
-        difficulty: getRandomDifficulty(),
-        totalSeats: 100 + i * 10,
-        winningSeats: 10,
-        entryFee: 5 + i,
-        prizePool: 500 + i * 100,
-        language: "ENGLISH",
-      },
+  for (const userData of seedData.users) {
+    await prisma.user.upsert({
+      where: { email: userData.email },
+      update: {},
+      create: {
+        name: userData.name,
+        email: userData.email,
+        password: password, 
+        role: userData.role,
+        isProfileComplete: true,
+        wallet: {
+          create: { balance: userData.role === Role.ADMIN ? 10000 : 100 }
+        }
+      }
     });
-
-    // 4️⃣ Add 5 Questions per Tournament
-    for (let q = 1; q <= 5; q++) {
-      await prisma.question.create({
-        data: {
-          tournamentId: tournament.id,
-          text: `Question ${q} for Tournament ${i}?`,
-          options: {
-            create: [
-              { text: "Option A", isCorrect: q % 4 === 0 },
-              { text: "Option B", isCorrect: q % 4 === 1 },
-              { text: "Option C", isCorrect: q % 4 === 2 },
-              { text: "Option D", isCorrect: q % 4 === 3 },
-            ],
-          },
-        },
-      });
-    }
-
-    console.log(`✅ Tournament ${i} created`);
   }
 
-  console.log("🎉 Seeding completed successfully!");
+  console.log("Seeding Plans...");
+  for (const planData of seedData.plans) {
+    await prisma.plan.deleteMany({ where: { title: planData.title } });
+    await prisma.plan.create({ data: planData });
+  }
+
+  console.log("Seeding Categories & Tournaments...");
+  
+  const startTime = new Date(); 
+  const windowOpenTime = new Date(startTime.getTime() - 15 * 60 * 1000); 
+  const endTime = new Date();
+  endTime.setFullYear(endTime.getFullYear() + 1);
+
+  for (const catData of seedData.categories) {
+
+    const category = await prisma.category.upsert({
+      where: { name: catData.name },
+      update: {},
+      create: { name: catData.name }
+    });
+
+    const createdSubCats = [];
+    for (const subName of catData.subCategories) {
+      const sub = await prisma.subCategory.upsert({
+        where: { name: subName },
+        update: {},
+        create: { name: subName, categoryId: category.id }
+      });
+      createdSubCats.push(sub);
+    }
+
+    const tData = catData.tournament;
+    const tournament = await prisma.tournament.create({
+      data: {
+        title: tData.title,
+        description: tData.description,
+        categoryId: category.id,
+        subCategoryId: createdSubCats[0].id,
+        startTime,
+        windowOpenTime,
+        endTime,
+        durationPerQ: tData.durationPerQ,
+        totalQuestions: tData.totalQuestions,
+        difficulty: tData.difficulty,
+        totalSeats: tData.totalSeats,
+        winningSeats: tData.winningSeats,
+        entryFee: tData.entryFee,
+        prizePool: tData.prizePool,
+        language: "ENGLISH",
+        
+        questions: {
+          create: tData.questions.map((q) => ({
+            text: q.text,
+            options: {
+              create: q.options.map((opt) => ({
+                text: opt.text,
+                isCorrect: opt.isCorrect
+              }))
+            }
+          }))
+        }
+      }
+    });
+  }
+
+  console.log("Seeding completed successfully!");
 }
 
 main()
