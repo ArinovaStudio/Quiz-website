@@ -152,7 +152,7 @@ export function QuizCard({
           </div>
           
         </div>
-          <div className={`flex items-center gap-1 pt-1 pb-2 animate-pulse ${styleForMe}`}>
+          <div className={`flex items-center gap-1 pt-1 pb-2 animate-pulse text-white`}>
             <Radio className="w-3 h-3 stroke-[2.5px]" />
             <span className="text-[10px] sm:text-[15px] font-[400] uppercase">
               {message}
