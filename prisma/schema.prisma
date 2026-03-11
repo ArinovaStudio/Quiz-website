@@ -175,7 +175,6 @@ model Tournament {
   durationPerQ Int
   totalQuestions Int
   difficulty Difficulty
-  // status TournamentStatus @default(DRAFT)
   totalSeats Int
   winningSeats Int
   entryFee Float
@@ -221,11 +220,9 @@ model UserResponse {
   isCorrect Boolean
   timeTaken Float
   createdAt DateTime @default(now())
-  
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  
   @@unique([userId, questionId])
 }
 enum REGISTRATION_STATUS {
@@ -246,7 +243,6 @@ model Registration {
   status REGISTRATION_STATUS @default(NOT_PLAYED)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-
   @@unique([userId, tournamentId])
 }
 

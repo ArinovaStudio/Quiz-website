@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import Wrapper from "../../../_components/Wrapper";
+import { LeaderboardListSkeleton, Top3Skeleton } from "./_components/Skeletons";
 
 function formatTime(seconds: number) {
   const m = Math.floor(seconds / 60);
@@ -45,7 +46,7 @@ export default function Page() {
     fetcher,
     {
       revalidateOnFocus: false,
-      revalidateIfStale: false
+      revalidateIfStale: false,
     }
   );
   const leaderboard = data?.leaderboard;
@@ -58,6 +59,10 @@ export default function Page() {
       <ErrorLoading
         error={error}
         loading={loading}
+        loadingCard={Top3Skeleton}
+        loadingCols={1}
+        loadingRows={1}
+        loadingCount={1}
         dataLength={top3?.length}
         emptyMessage="No Users Played!"
       >
@@ -128,7 +133,11 @@ export default function Page() {
         <ErrorLoading
           error={error}
           loading={loading}
+          loadingCols={1}
+          loadingRows={1}
+          loadingCount={1}
           dataLength={rest?.length}
+          loadingCard={LeaderboardListSkeleton}
           emptyMessage="No More Users!"
         >
           <div className="rounded-[14px] border-[3px] border-black bg-white overflow-hidden shadow-[5px_5px_0px_#000]">
