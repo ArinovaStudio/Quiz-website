@@ -5,7 +5,20 @@ export const colorMap: any = {
   amber: "bg-[#FFDB58]",
   blue: "bg-[#A5F3FC]",
   "sky-blue": "bg-blue-200",
-  purple: "bg-[#A78BFA]"
+  purple: "bg-[#A78BFA]",
+  // new colors
+  mint: "bg-[#CFFFE5]",
+  lavender: "bg-[#E6D7FF]",
+  peach: "bg-[#FFD6C9]",
+  coral: "bg-[#FFC1B6]",
+  lime: "bg-[#D9F99D]",
+  teal: "bg-[#B2F5EA]",
+  rose: "bg-[#FFE4E6]",
+  indigo: "bg-[#C7D2FE]",
+  cyan: "bg-[#CFFAFE]",
+  orange: "bg-[#FED7AA]",
+  fuchsia: "bg-[#F5D0FE]",
+  emerald: "bg-[#A7F3D0]"
 };
 export const SITE_NAME = "Olobix";
 

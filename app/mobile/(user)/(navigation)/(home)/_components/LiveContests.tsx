@@ -1,9 +1,8 @@
 "use client";
 import QuizCard, { HomeQuizCardSkeleton } from "@/components/QuizCard";
 import { colorMap } from "@/lib/constants";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import ErrorLoading from "@/components/ErrorLoading";
-import useSWRInfinite from "swr/infinite";
 import { fetcher } from "@/lib/fetcher";
 import { Loader2 } from "lucide-react";
 import { useInfiniteScroll } from "@/components/useInfiniteScroll";

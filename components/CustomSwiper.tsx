@@ -21,7 +21,7 @@ export default function CustomSwiper({ children }: any) {
     >
       {Array.isArray(children) &&
         children.map((child, index) => (
-          <SwiperSlide className="w-full items-center flex justify-center max-w-[110px]!" key={index}>
+          <SwiperSlide className="w-full items-center flex justify-center max-w-[95px]!" key={index}>
             {child}
           </SwiperSlide>
         ))}
