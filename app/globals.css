@@ -126,6 +126,22 @@
   }
 }
 
+body {
+  position: relative;
+}
+
+@layer utilities {
+  @media (max-width: 768px) {
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      backdrop-filter: saturate(0.75);
+      z-index: 9999;
+    }
+  }
+}
 ::-webkit-scrollbar,::-webkit-scrollbar-button,::-webkit-scrollbar-thumb{
   display: none;
 }
