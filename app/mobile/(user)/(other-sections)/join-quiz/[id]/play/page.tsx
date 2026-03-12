@@ -10,6 +10,7 @@ import { fetcher } from "@/lib/fetcher";
 import ErrorLoading from "@/components/ErrorLoading";
 import { HandleSkeleton } from "@/app/mobile/(user)/(navigation)/profile/_components/HandleSkeleton";
 import toast from "react-hot-toast";
+import TournamentEndModal from "./_components/TournamentEndModal";
 
 // const MOCK_QUESTIONS = [
 //   {
@@ -48,6 +49,7 @@ export default function Page() {
       revalidateIfStale: false
     }
   );
+  const [open,setOpen] = useState(false);
   const tournament = data?.tournament;
   const QUESTIONS = tournament?.questions;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -133,13 +135,12 @@ export default function Page() {
   };
   const goToHome = async () => {
     await handleNext();
-    router.push(`/mobile`);
+    setOpen(true);
   };
 
   useEffect(() => {
     if (timeConsumed === 0) {
       if (currentIndex < (QUESTIONS?.length || 0) - 1) {
-        console.log(currentIndex);
         handleNext();
       }
     }
@@ -166,13 +167,13 @@ export default function Page() {
 
     return "bg-white border-black/30 text-black/60";
   };
-
   return (
     <Wrapper
       title={`Question ${currentIndex + 1} of ${
         QUESTIONS?.length ?? "Loading..."
       }`}
     >
+      <TournamentEndModal open={open} endDateTime={tournament?.endTime} redirectTo="/mobile" />
       <ErrorLoading
         loading={loading}
         error={error}

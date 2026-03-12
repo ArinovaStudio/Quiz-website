@@ -18,6 +18,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import useSWR from "swr";
 import Wrapper from "../../_components/Wrapper";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const difficultyColors = {
   EASY: "bg-[#A5F3A0]",
@@ -300,7 +301,7 @@ export default function Page() {
               }`}
         >
           {pending || loading ? (
-            <Loader2 className="mx-auto w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+            <Skeleton className="h-5 w-20 mx-auto bg-gray-100/80" />
           ) : (
             buttonLabel
           )}

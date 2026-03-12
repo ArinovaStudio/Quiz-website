@@ -80,6 +80,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         title: tournament.title,
         status: "LIVE",
         startTime: tournament.startTime,
+        endTime: tournament.endTime,
         durationPerQ: tournament.durationPerQ,
         totalQuestions: tournament.totalQuestions,
         questions: tournament.questions
