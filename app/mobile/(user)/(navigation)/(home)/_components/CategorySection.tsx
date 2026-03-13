@@ -20,7 +20,7 @@ export default function CategorySection({ selected, setSelected }: Props) {
   const colors = Object.keys(colorMap);
   const categories = data?.categories?.slice(0,5) ?? [];
   return (
-    <div className="space-y-3 sm:space-y-4 px-1 sm:px-0">
+    <div className="space-y-3 mt-3 sm:space-y-4 px-1 sm:px-0">
       {/* Header */}
       <div className="flex uppercase text-lg sm:text-2xl font-extrabold justify-between items-center">
         <div className="tracking-wide">categories</div>
@@ -35,8 +35,8 @@ export default function CategorySection({ selected, setSelected }: Props) {
           loading={isLoading}
           error={error}
           loadingCard={CategoryCardSkeleton}
-          loadingCount={3}
-          loadingCols={3}
+          loadingCount={4}
+          loadingCols={4}
           loadingRows={1}
           dataLength={categories.length}
           emptyMessage="No Categories Found!"

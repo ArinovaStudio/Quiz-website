@@ -7,8 +7,10 @@ import { QuizCard, QuizCardSkeleton } from "../_components/QuizCard";
 import { useEffect, useMemo, useState } from "react";
 import { colorMap } from "@/lib/constants";
 import SpecialIcon from "@/components/SpecialIcon";
-import { ArrowLeft, Filter } from "lucide-react";
+import { ArrowLeft, Filter, Loader2 } from "lucide-react";
 import useGoBack from "@/components/GoBack";
+import useSWRInfinite from "swr/infinite";
+import { useInfiniteScroll } from "@/components/useInfiniteScroll";
 export default function page() {
   const { id } = useParams();
   const [filterOpen, setFilterOpen] = useState(false);
@@ -38,32 +40,45 @@ export default function page() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  const recommendations = data?.recommendations ?? [];
-  const filteredRecommendations = useMemo(()=>{
-    if(selectedFilter==="low"){
-      return recommendations.filter((event: any)=>{
-        return event.prizePool<50000;
-      })
-    }else if(selectedFilter==="medium"){
-      return recommendations.filter((event: any)=>{
-        return event.prizePool>=50000 && event.prizePool<=200000;
-      })
-    }else if(selectedFilter==="high"){
-      return recommendations.filter((event: any)=>{
-        return event.prizePool>=200000;
-      })
+  const {
+    data: rdata,
+    isLoading: recommendationsLoading,
+    error: RecommendationsError,
+    observerRef,
+    hasMore,
+    isValidating,
+  } = useInfiniteScroll({
+    endpoint: `/api/user/tournaments/${id}/recommended-events`,
+    fetcher,
+  });
+  const recommendations = rdata
+    ? rdata.flatMap((item: any) => item.tournaments)
+    : [];
+  const filteredRecommendations = useMemo(() => {
+    if (selectedFilter === "low") {
+      return recommendations.filter((event: any) => {
+        return event.prizePool < 50000;
+      });
+    } else if (selectedFilter === "medium") {
+      return recommendations.filter((event: any) => {
+        return event.prizePool >= 50000 && event.prizePool <= 200000;
+      });
+    } else if (selectedFilter === "high") {
+      return recommendations.filter((event: any) => {
+        return event.prizePool >= 200000;
+      });
     }
     return recommendations;
-  },[recommendations,selectedFilter]);
+  }, [recommendations, selectedFilter]);
   const item = !isLoading && data?.tournament;
   const goBack = useGoBack();
   return (
     <div className="w-full space-y-4 min-h-screen">
       <div className="sticky top-0 z-100 bg-gray-100 max-h-100 overflow-hidden">
         <div
-          className={`min-h-[100px] 
+          className={`min-h-[80px] 
                     flex flex-col justify-between 
-                    p-3 md:p-4 
+                    p-3 md:p-4
                     gap-4
                     ${colorMap["amber"]} 
                     border-b-6 md:border-b-8 border-black 
@@ -166,11 +181,11 @@ export default function page() {
 
         <div className="grid gap-2">
           <ErrorLoading
-            error={error}
+            error={RecommendationsError}
             loadingCard={QuizCardSkeleton}
             loadingCount={5}
-            loading={isLoading}
-            dataLength={filteredRecommendations?.length}
+            loading={recommendationsLoading}
+            dataLength={recommendations?.length}
             emptyMessage="No Related Tournaments Found!"
           >
             {filteredRecommendations?.map(
@@ -180,6 +195,12 @@ export default function page() {
                 )
             )}
           </ErrorLoading>
+            {!isLoading && isValidating && (
+              <div className="w-full">
+                <Loader2 size={20} className="mx-auto animate-spin" />
+              </div>
+            )}
+            <div ref={observerRef} />
         </div>
       </div>
     </div>

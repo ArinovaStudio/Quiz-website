@@ -41,14 +41,9 @@ export default function page() {
             return (
               <QuizCard
                 key={quiz.id}
-                title={quiz.title}
-                prizePool={quiz.prizePool}
                 index={index}
-                id={quiz.id}
                 color={colors[index % n]}
-                category={quiz.category}
-                totalSeats={quiz.totalSeats}
-                seatsLeft={quiz.seatsLeft}
+                {...quiz}
               />
             );
           })}

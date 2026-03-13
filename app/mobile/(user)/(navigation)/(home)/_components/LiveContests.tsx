@@ -9,7 +9,7 @@ import { useInfiniteScroll } from "@/components/useInfiniteScroll";
 
 interface Props {
   selected: string;
-  setSelected: React.Dispatch<React.SetStateAction<string>>;
+  setSelected: React.Dispatch<React.SetStateAction<string>>; 
 }
 export default function LiveContests({ selected, setSelected }: Props) {
   const { data, observerRef, isLoading, isValidating, error } =
@@ -53,15 +53,10 @@ export default function LiveContests({ selected, setSelected }: Props) {
           {tournaments?.map((quiz: any, index: number) => {
             return (
               <QuizCard
-                key={quiz.id}
-                title={quiz.title}
-                prizePool={quiz.prizePool}
-                index={index}
-                id={quiz.id}
-                color={colors[index % n]}
-                category={quiz.category}
-                totalSeats={quiz.totalSeats}
-                seatsLeft={quiz.seatsLeft}
+              index={index}
+              key={quiz.id}
+              color={colors[index % n]}
+              {...quiz}
               />
             );
           })}

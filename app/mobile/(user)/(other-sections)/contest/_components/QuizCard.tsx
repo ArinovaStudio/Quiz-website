@@ -50,8 +50,6 @@ export function QuizCard({
     if (!totalSeats) return 0;
     return Math.min(100, ((totalSeats - seatsLeft) / totalSeats) * 100);
   }, [totalSeats, seatsLeft]);
-
-  const rotation = index % 2 === 0 ? "-0.6deg" : "0.6deg";
   const colors = Object.values(colorMap);
   const startTimeObject = new Date(startTime);
   const now = new Date();
@@ -87,8 +85,7 @@ export function QuizCard({
       }`}
 
       style={{
-        boxShadow: "5px 5px 0px #000000",
-        transform: `rotate(${rotation})`,
+        boxShadow: "5px 5px 0px #000000"
       }}
     >
       <CardContent className="relative z-10 p-0">
@@ -152,7 +149,7 @@ export function QuizCard({
           </div>
           
         </div>
-          <div className={`flex items-center gap-1 pt-1 pb-2 animate-pulse text-white`}>
+          <div className={`flex items-center gap-1 pt-1 pb-2 animate-pulse text-black`}>
             <Radio className="w-3 h-3 stroke-[2.5px]" />
             <span className="text-[10px] sm:text-[15px] font-[400] uppercase">
               {message}

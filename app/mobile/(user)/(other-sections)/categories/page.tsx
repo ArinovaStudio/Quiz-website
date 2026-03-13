@@ -24,39 +24,17 @@ export default function page() {
     <Wrapper title={"categories"}>
       <ErrorLoading
         loadingCard={CategoryCardSkeleton}
-        loadingCount={6}
+        loadingCount={16}
         loaderClassName="p-5"
-        loadingCols={3}
-        loadingRows={2}
+        loadingCols={4}
+        loadingRows={4}
         loading={loading}
         dataLength={categories.length}
         emptyMessage="No Categories Found!"
         error={error}
       >
-        <div className="grid grid-cols-3 gap-5 p-5">
-          {/* {[{ name: "defaulttype" }, ...categories].map((cat: Category, index: number) =>
-          cat.name === "defaulttype" ? (
-            <CategoryCard
-              key="all"
-              category={{
-                name: "all",
-                image: cat?.image,
-                id: "all",
-                tournamentsSize: categories?.reduce(
-                  (acc: number, item: any) => acc + (item?.tournamentsSize ?? 0),
-                  0
-                )
-              }}
-              color={colors[2]}
-            />
-          ) : (
-            <CategoryCard
-              key={cat?.id}
-              category={cat}
-              color={colors[index % colors.length]}
-            />
-          )
-        )} */}
+        <div className="grid grid-cols-4 gap-5 p-5">
+
           {categories.map((cat: Category, index: number) => (
             <CategoryCard
               redirectBase="/mobile/categories"

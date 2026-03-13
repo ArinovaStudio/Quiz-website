@@ -28,14 +28,14 @@ export default function page() {
         loading={isLoading}
         loaderClassName="p-5"
         loadingCard={CategoryCardSkeleton}
-        loadingCount={6}
-        loadingCols={3}
-        loadingRows={2}
+        loadingCount={16}
+        loadingCols={4}
+        loadingRows={4}
         dataLength={subCategories.length}
         emptyMessage="No Sub Categories Found!"
         error={error}
       >
-        <div className="grid grid-cols-3 gap-5 p-5">
+        <div className="grid grid-cols-4 gap-5 p-5">
           {subCategories.map(
             (cat: Category, index: number) =>
               (

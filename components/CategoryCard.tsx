@@ -1,6 +1,7 @@
 import { colorMap } from "@/lib/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Skeleton } from "./ui/skeleton";
+import Image from "next/image";
 interface CategoryCardProps {
   id: string | null;
   name: string;
@@ -28,119 +29,112 @@ export default function CategoryCard({
         ${color && colorMap[color]}
         flex-shrink-0
         w-full h-full!
-        rounded-[16px]
+        rounded-lg
         border-[3px]
         overflow-hidden
         text-center
+        relative!
+        border-5
+        border-foreground
         transition-all duration-300
         hover:scale-102
         active:scale-101
         focus:outline-none focus:ring-4 focus:ring-black/20
-        px-1 py-2
-        ${selected ? "border-black" : "border-gray-300 bg-gray-50"}
+        pb-1
       `}
       style={{
-        boxShadow: selected
-          ? "5px 5px 0px #000000"
-          : "2px 2px 0px rgba(0,0,0,0.1)",
+        boxShadow: "5px 5px 0px #000000",
       }}
     >
       {/* Avatar */}
-      <Avatar className="
-        flex
-        w-[48px] h-[48px]
-        sm:w-[56px] sm:h-[56px]
-        my-1
-        mx-auto
-        border-3 border-black
-        items-center justify-center
-      ">
-        <AvatarImage
-          alt={name}
-          src={image}
-          className={`w-full h-full object-cover ${
-            selected ? "" : "grayscale"
-          }`}
+      <div className="relative w-full h-22 rounded-b-lg overflow-hidden">
+        <Image
+          src={image || "/sports.png"}
+          className="object-cover"
+          alt={"Image"}
+          fill
         />
-        <AvatarFallback className="w-full uppercase h-full text-base sm:text-lg font-extrabold text-black">
-          {name[0]}
-        </AvatarFallback>
-      </Avatar>
+      </div>
 
-      {/* Name */}
-      <div className="p-1">
+      {/* Event Count */}
+      <div className="absolute bottom-7 sm:bottom-8 left-1">
         <p
           className={`
-            text-[11px]
-            sm:text-[12px]
+            text-[10px]
             font-[900]
             uppercase
             leading-tight
+            w-7
             truncate
-            mb-1
-            ${selected ? "text-black" : "text-gray-500"}
+            bg-foreground/60
+            text-background
+            rounded-full
           `}
         >
-          {name}
+          {eventsCount}
         </p>
       </div>
 
-      {/* Events Count */}
-      <div className="px-1 sm:px-2">
+      {/* Event Name */}
+      <div>
         <p
           className="
             font-[900]
-            py-1.5 px-2
-            sm:p-2
-            text-[10px]
+            px-2
+            pb-1
+            pt-[5px]
+            text-[9px]
             sm:text-xs
             uppercase
-            leading-tight
-            bg-foreground
             text-background
+            leading-tight
             rounded-xl
             truncate
-            mb-1
+            pb-1
           "
         >
-          {eventsCount}
+          {name}
         </p>
       </div>
     </button>
   );
 }
 
-
 export function CategoryCardSkeleton() {
   return (
     <div
       className="
         flex-shrink-0
-        w-full
+        w-full h-full
         rounded-[16px]
-        border-[3px] border-gray-200
-        bg-card
+        border-[3px]
+        max-w-[85px]!
+        max-h-[120px]
+        border-foreground
         overflow-hidden
-        px-2 py-2
+        relative
+        pb-1
       "
       style={{
-        boxShadow: "2px 2px 0px rgba(0,0,0,0.1)",
+        boxShadow: "5px 5px 0px #000000",
       }}
     >
-      {/* Avatar Skeleton */}
-      <div className="flex justify-center my-2 sm:my-3">
-        <Skeleton className="w-[48px] h-[48px] sm:w-[56px] sm:h-[56px] rounded-full" />
+      {/* Image Skeleton */}
+      <div className="relative w-full h-22 overflow-hidden">
+        <Skeleton className="w-full h-full bg-gray-400/10 rounded-b-lg" />
       </div>
 
-      {/* Name Skeleton */}
-      <div className="p-1 flex justify-center">
-        <Skeleton className="h-[12px] sm:h-[14px] w-3/4 rounded-md" />
+      {/* Event Count Skeleton */}
+      <div className="absolute bottom-7 sm:bottom-8 left-1">
+        <Skeleton className="h-4 w-7 bg-gray-400/10 rounded-full" />
       </div>
 
-      {/* Events Count Skeleton */}
-      <div className="px-1 sm:px-2 flex justify-center mt-2">
-        <Skeleton className="h-[24px] sm:h-[28px] w-2/3 rounded-xl" />
+      {/* Event Name Skeleton */}
+      <div className="px-2 pt-[5px] pb-1 flex justify-center">
+        <Skeleton className="h-3 w-14 bg-gray-400/10 rounded-md" />
       </div>
     </div>
   );
 }
+
+
