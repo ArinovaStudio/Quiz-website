@@ -61,27 +61,25 @@ const Hero = () => {
           <div className="flex-1 flex justify-center">
             <div className="relative">
               {/* Phone frame */}
-              <div className="relative w-[280px] md:w-[300px]">
+              <div className="relative w-[500px] md:w-[600px]">
                 {/* Phone body */}
-                <div className="bg-foreground rounded-[40px] p-[6px] neo-shadow-xl">
+                {/* <div className="bg-foreground rounded-[40px] p-[6px] neo-shadow-xl"> */}
                   {/* Phone inner bezel */}
-                  <div className="bg-foreground rounded-[36px] p-[2px] relative">
-                    {/* Notch */}
-                    <div className="absolute top-0 left-50 -translate-x-1/2 w-24 h-6 bg-foreground rounded-b-2xl z-10" />
+                  {/* <div className="bg-foreground rounded-[36px] p-[2px] relative"> */}
                     {/* Screen */}
                     <div className="rounded-[34px] overflow-hidden bg-background">
                       <img
-                        src={"/hero-phone.png"}
+                        src={"/mockup.png"}
                         alt={`${SITE_NAME} App Screenshot`}
                         className="w-full h-auto block"
                       />
                     </div>
-                  </div>
-                </div>
+                  {/* </div> */}
+                {/* </div> */}
               </div>
 
               {/* Floating badges */}
-              <div className="absolute -top-4 -right-6 bg-card neo-border neo-shadow px-3 py-2 rotate-6 animate-bounce-subtle">
+              <div className="absolute -top-0 -right-0 bg-card neo-border neo-shadow px-3 py-2 rotate-6 animate-bounce-subtle">
                 <span className="font-bold text-foreground text-sm">100 FREE TOKENS!</span>
               </div>
               <div className="absolute -bottom-4 -left-6 bg-card neo-border neo-shadow px-3 py-2 -rotate-3">
