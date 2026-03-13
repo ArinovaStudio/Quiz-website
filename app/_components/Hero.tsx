@@ -61,7 +61,7 @@ const Hero = () => {
           <div className="flex-1 flex justify-center">
             <div className="relative">
               {/* Phone frame */}
-              <div className="relative w-[500px] md:w-[600px]">
+              <div className="relative w-[350px] md:w-[600px]">
                 {/* Phone body */}
                 {/* <div className="bg-foreground rounded-[40px] p-[6px] neo-shadow-xl"> */}
                   {/* Phone inner bezel */}
