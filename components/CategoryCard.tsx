@@ -26,13 +26,14 @@ export default function CategoryCard({
       type="button"
       onClick={onClick}
       className={`
-        ${color && colorMap[color]}
+        ${color && colorMap[color]} 
         flex-shrink-0
         w-full h-full!
         rounded-lg
         border-[3px]
         overflow-hidden
         text-center
+        max-w-[85px]
         relative!
         border-5
         border-foreground
@@ -106,7 +107,7 @@ export function CategoryCardSkeleton() {
       className="
         flex-shrink-0
         w-full h-full
-        rounded-[16px]
+        rounded-lg
         border-[3px]
         max-w-[85px]!
         max-h-[120px]
