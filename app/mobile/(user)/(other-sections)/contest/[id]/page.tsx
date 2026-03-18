@@ -11,9 +11,10 @@ import { ArrowLeft, Filter, Loader2 } from "lucide-react";
 import useGoBack from "@/components/GoBack";
 import useSWRInfinite from "swr/infinite";
 import { useInfiniteScroll } from "@/components/useInfiniteScroll";
+import { LANGUAGES } from "@/lib/constants";
 export default function page() {
   const { id } = useParams();
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false); 
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const { data, isLoading, error } = useSWR(
     `/api/user/tournaments/${id}`,
@@ -22,9 +23,12 @@ export default function page() {
   );
   const filters = [
     { id: "all", label: "All Contests" },
-    { id: "high", label: "High Stakes (₹2L+)" },
-    { id: "medium", label: "Medium (₹50K-₹2L)" },
-    { id: "low", label: "Beginner (Under ₹50K)" },
+    { id: "high", label: "High Stakes (₹2L+)",type:"price" },
+    { id: "medium", label: "Medium (₹50K-₹2L)",type:"price" },
+    { id: "low", label: "Beginner (Under ₹50K)",type:"price" },
+    ...LANGUAGES.map((language)=>{
+        return {id: language,label: language,type: "language"}
+    })
   ];
   const [isShrunk, setIsShrunk] = useState(false);
   useEffect(() => {
@@ -67,6 +71,10 @@ export default function page() {
       return recommendations.filter((event: any) => {
         return event.prizePool >= 200000;
       });
+    }else if(LANGUAGES.includes(selectedFilter)){
+      return recommendations.filter((event)=>{
+        return event.language === selectedFilter
+      });
     }
     return recommendations;
   }, [recommendations, selectedFilter]);
@@ -74,7 +82,7 @@ export default function page() {
   const goBack = useGoBack();
   return (
     <div className="w-full space-y-4 min-h-screen">
-      <div className="sticky top-0 z-100 bg-gray-100 max-h-100 overflow-hidden">
+      <div className="sticky top-0 z-100 bg-gray-100 max-h-120 overflow-hidden">
         <div
           className={`min-h-[80px] 
                     flex flex-col justify-between 
@@ -176,7 +184,7 @@ export default function page() {
       </div>
       <div className="grid gap-4 mx-3">
         <div className="uppercase text-sm sm:text-base md:text-2xl font-extrabold">
-          MORE CONTESTS ({data?.recommendations?.length ?? 0})
+          MORE CONTESTS ({filteredRecommendations?.length ?? 0})
         </div>
 
         <div className="grid gap-2">
@@ -185,7 +193,7 @@ export default function page() {
             loadingCard={QuizCardSkeleton}
             loadingCount={5}
             loading={recommendationsLoading}
-            dataLength={recommendations?.length}
+            dataLength={filteredRecommendations?.length}
             emptyMessage="No Related Tournaments Found!"
           >
             {filteredRecommendations?.map(

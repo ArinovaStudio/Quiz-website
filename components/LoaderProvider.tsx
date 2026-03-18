@@ -36,13 +36,14 @@ export default function LoaderProvider({ children }: { children: React.ReactNode
 
       {isLoading && (
         /* Note: I updated 'z-300' to 'z-[300]' and added 'inset-0' so it properly covers the screen */
-        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-yellow-500/30">
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-yellow-500/20">
           <Image
-            src={"/loading.png"}
-            height={200}
-            width={200}
+            unoptimized
+            src={"/loading.gif"}
+            height={300}
+            width={300}
             alt={"Loading"}
-            className="animate-spin brightness-0 invert sepia saturate-[1000%] hue-rotate-[10deg]"
+            className="brightness-0 invert sepia saturate-[1000%] hue-rotate-[10deg]"
           />
         </div>
       )}

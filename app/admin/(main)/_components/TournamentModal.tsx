@@ -22,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { Loader2, Loader2Icon } from "lucide-react";
+import { LANGUAGES } from "@/lib/constants";
 type TournamentFormValues = {
   title: string;
   description?: string;
@@ -92,7 +93,7 @@ const inputFields = [
   { label: "Entry Fee", name: "entryFee", type: "number" },
   { label: "Prize Pool", name: "prizePool", type: "number" },
 ];
-const LANGUAGES = ["ENGLISH", "HINDI", "HINGLISH"];
+
 const formatDateTimeLocal = (dateString?: string) => {
   if (!dateString) return "";
   const date = new Date(dateString);

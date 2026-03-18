@@ -63,6 +63,7 @@ export async function GET(
           entryFee: true,
           prizePool: true,
           totalSeats: true,
+          language: true,
           winningSeats: true,
           difficulty: true,
           _count: { select: { registration: true } },

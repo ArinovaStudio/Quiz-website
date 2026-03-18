@@ -30,3 +30,5 @@ export const difficultyColors: any = {
 };
 
 export const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|icloud\.com)$/;
+
+export const LANGUAGES = ["ENGLISH", "HINDI", "HINGLISH"];
