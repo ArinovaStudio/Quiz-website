@@ -46,10 +46,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         name: h.user.name,
         score: h.score,
         time: h.totalTime.toFixed(2),
-      }))
+      })),
     ];
 
-    return NextResponse.json({ success: true, leaderboard }, { status: 200 });
+    return NextResponse.json({ success: true, leaderboard, prizes: exist.prizes }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });

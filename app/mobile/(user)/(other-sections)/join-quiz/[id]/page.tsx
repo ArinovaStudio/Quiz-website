@@ -10,8 +10,10 @@ import {
   Clock10,
   FileQuestion,
   Loader2,
+  Medal,
+  Award,
   Trophy,
-  Zap
+  Zap,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +21,7 @@ import toast from "react-hot-toast";
 import useSWR from "swr";
 import Wrapper from "../../_components/Wrapper";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { getFormattedRank } from "@/lib/constants";
 const difficultyColors = {
   EASY: "bg-[#A5F3A0]",
   MEDIUM: "bg-[#FFDB58]",
@@ -133,7 +135,7 @@ export default function Page() {
       buttonLabel = "🏁 Contest has ended";
       break;
   }
-
+  const prizes = tournament?.prizes ?? [];
   return (
     <Wrapper title="Join contest">
       {/* Header */}
@@ -201,7 +203,7 @@ export default function Page() {
       <div className="px-4 pb-4">
         <h3 className="text-[18px] font-[900] uppercase mb-3">Contest Info</h3>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 max-h-[340px] h-full overflow-scroll gap-3">
           <InfoCard
             icon={<FileQuestion />}
             value={
@@ -262,6 +264,51 @@ export default function Page() {
             label="Time"
             bg="bg-[#A78BFA]"
           />
+
+<div className="col-span-2">
+  <div className="border rounded-xl p-4 bg-card shadow-sm">
+    
+    {/* Header */}
+    <div className="flex items-center gap-2 mb-4">
+      <Trophy className="w-5 h-5 text-yellow-500" />
+      <h3 className="text-sm font-semibold tracking-wide">
+        Prize Distribution
+      </h3>
+    </div>
+
+    {/* Content */}
+    {prizes && prizes.length > 0 ? (
+      <div className="grid gap-3">
+        {prizes.map((prize: string, i: number) => {
+          const Icon =
+            i === 0 ? Trophy : i === 1 ? Medal : i === 2 ? Award : Award;
+
+          return (
+            <div
+              key={i}
+              className="flex items-center justify-between px-4 py-2 rounded-lg border bg-muted/40 hover:bg-muted transition"
+            >
+              <div className="flex items-center gap-2">
+                <Icon className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold">
+                  {getFormattedRank(i + 1)}
+                </span>
+              </div>
+
+              <span className="text-sm text-muted-foreground font-medium">
+                {prize || "—"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    ) : (
+      <div className="text-xs font-medium text-muted-foreground">
+        No prizes defined yet
+      </div>
+    )}
+  </div>
+</div>
         </div>
       </div>
 

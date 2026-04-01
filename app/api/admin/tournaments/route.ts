@@ -72,6 +72,7 @@ const tournamentSchema = z.object({
   language: z.string().min(1,"Language Is Required!"),
   totalSeats: z.number().min(2, "Must have at least 2 seats"),
   winningSeats: z.number().min(0, "Cannot be negative"),
+  prizes: z.array(z.number().min(1)).min(1,"There must be at least one prize")
 });
 
 export async function POST(req: NextRequest) {
@@ -89,7 +90,6 @@ export async function POST(req: NextRequest) {
     }
 
     const data = validation.data;
-
     const category = await prisma.category.findUnique({
         where: { id: data.categoryId }
     });
@@ -140,6 +140,7 @@ export async function POST(req: NextRequest) {
         difficulty: data.difficulty,
         entryFee: data.entryFee,
         prizePool: data.prizePool,
+        prizes: data.prizes,
         totalSeats: data.totalSeats,
         winningSeats: data.winningSeats,
         questions: {

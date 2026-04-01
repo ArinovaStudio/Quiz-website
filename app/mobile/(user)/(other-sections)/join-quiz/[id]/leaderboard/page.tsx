@@ -4,7 +4,7 @@ import Link from "@/components/AppLink";
 import ErrorLoading from "@/components/ErrorLoading";
 import { fetcher } from "@/lib/fetcher";
 import { motion } from "framer-motion";
-import { Clock, FileQuestion, Home, Medal, Trophy } from "lucide-react";
+import { Clock, FileQuestion, Home, Medal, Trophy, Award } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -50,9 +50,12 @@ export default function Page() {
     }
   );
   const leaderboard = data?.leaderboard;
+  const prizes = data?.prizes ?? [];
   const loading = isLoading || isValidating || ending;
   const top3 = leaderboard?.slice(0, 3);
+  const top3prizes = prizes.slice(0, 3);
   const rest = leaderboard?.slice(3);
+  const restprizes = prizes.slice(3);
   return (
     <Wrapper title="LeaderBoard">
       {/* 🏆 PODIUM */}
@@ -108,10 +111,14 @@ export default function Page() {
                         {player.name}
                       </p>
                       <p className="text-[11px] font-[700] text-black/80">
-                        {formatTime(player.time)}
+                        <span className="font-bold">Prize:</span>{" "}
+                        {top3prizes?.[index] ?? "-"}
                       </p>
                       <p className="text-[11px] font-[700] text-black/80">
-                        {player.score}
+                        <span className="font-bold">Time:</span>{" "}{formatTime(player.time)}
+                      </p>
+                      <p className="text-[11px] font-[700] text-black/80">
+                        <span className="font-bold">Score:</span>{" "}{player.score}
                       </p>
                     </div>
 
@@ -172,6 +179,10 @@ export default function Page() {
                     </span>
                   </div>
                 </div>
+                  <p className="text-[11px] font-[700] flex flex-col text-black/80">
+                    <span className="font-bold">Prize:</span>
+                    {restprizes?.[index] ?? "-"}
+                  </p>
               </motion.div>
             ))}
           </div>

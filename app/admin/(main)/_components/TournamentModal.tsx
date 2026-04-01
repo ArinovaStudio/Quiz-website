@@ -23,6 +23,8 @@ import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { Loader2, Loader2Icon } from "lucide-react";
 import { LANGUAGES } from "@/lib/constants";
+import { getFormattedRank } from "@/lib/constants";
+
 type TournamentFormValues = {
   title: string;
   description?: string;
@@ -39,6 +41,7 @@ type TournamentFormValues = {
   winningSeats: number;
   entryFee: number;
   prizePool: number;
+  prizes: number[];
 };
 
 interface Props {
@@ -65,6 +68,7 @@ const defaultValues: TournamentFormValues = {
   winningSeats: 0,
   entryFee: 0,
   prizePool: 0,
+  prizes: [],
 };
 const inputFields = [
   {
@@ -145,7 +149,30 @@ export default function TournamentModal({
     e.preventDefault();
     await onSubmit(formData);
   };
+  const handlePrizeChange = (index: number, value: number) => {
+    setFormData((prev) => {
+      const updatedPrizes = [...prev.prizes];
+      updatedPrizes[index] = value;
 
+      return {
+        ...prev,
+        prizes: updatedPrizes,
+      };
+    });
+  };
+  const addPrize = () => {
+    setFormData((prev) => ({
+      ...prev,
+      prizes: [...prev.prizes, 0],
+    }));
+  };
+  const removePrize = () => {
+    setFormData((prev) => {
+      const prizes = [...prev.prizes];
+      prizes.pop();
+      return { ...prev, prizes };
+    });
+  };
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl rounded-2xl">
@@ -255,14 +282,32 @@ export default function TournamentModal({
                   name={field.name}
                   type={field.type}
                   value={(formData as any)[field.name]}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     handleChange(
                       field.name as keyof TournamentFormValues,
                       field.type === "number"
                         ? Number(e.target.value)
                         : e.target.value
-                    )
-                  }
+                    );
+                    if (field.name === "winningSeats") {
+                      const newValue = parseInt(e.target.value) || 0;
+                      const oldValue = formData.winningSeats;
+
+                      const diff = newValue - oldValue;
+
+                      if (diff > 0) {
+                        // add multiple prizes
+                        for (let i = 0; i < diff; i++) {
+                          addPrize();
+                        }
+                      } else if (diff < 0) {
+                        // remove multiple prizes
+                        for (let i = 0; i < Math.abs(diff); i++) {
+                          removePrize();
+                        }
+                      }
+                    }
+                  }}
                 />
               </div>
             ))}
@@ -285,8 +330,47 @@ export default function TournamentModal({
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2 col-span-2">
+              <label className="text-sm font-medium">Prize Distribution</label>
+              {formData.prizes.length > 0 ? (
+                <div className="grid gap-2">
+                  {formData.prizes.map((prize, i) => {
+                    return (
+                      <div key={i} className="grid grid-cols-2">
+                        <span className="text-sm font-bold">
+                          {getFormattedRank(i + 1)}
+                        </span>
+                        <Input
+                          type="number"
+                          min={1}
+                          onChange={(e) =>
+                            handlePrizeChange(
+                              i,
+                              parseInt(e.target.value ?? "0") ?? 0
+                            )
+                          }
+                          value={prize}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-xs font-bold">
+                  No Valid Winning Seats Entered
+                </div>
+              )}
+            </div>
             <DialogFooter className="col-span-2 mt-4">
-              <Button disabled={pending} type="submit" className="w-full">
+              <Button
+                disabled={
+                  pending ||
+                  formData.prizes.length === 0 ||
+                  formData.prizes.some((value) => value === 0)
+                }
+                type="submit"
+                className="w-full"
+              >
                 {pending ? (
                   <Loader2 className="animate-spin" />
                 ) : initialData ? (

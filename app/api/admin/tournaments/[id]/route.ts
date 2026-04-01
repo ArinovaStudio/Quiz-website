@@ -5,11 +5,17 @@ import z from "zod";
 import { generateExactQuestions } from "@/lib/quizGenerator";
 import { getTournamentStatus } from "@/lib/getTournamentStatus";
 
-export async function GET( req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const admin = await checkAdmin();
     if (!admin) {
-      return NextResponse.json({ success: false, message: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const { id: tournamentId } = await params;
@@ -18,15 +24,27 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ id:
       where: { id: tournamentId },
       include: {
         questions: { include: { options: true } },
-        category: true
-      }
+        category: true,
+      },
     });
     if (!tournament) {
-      return NextResponse.json({ success: true, message: "Tournament not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: true, message: "Tournament not found" },
+        { status: 404 }
+      );
     }
-    return NextResponse.json({ success: false, tournament: {...tournament,status: getTournamentStatus(tournament)} }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: false,
+        tournament: { ...tournament, status: getTournamentStatus(tournament) },
+      },
+      { status: 200 }
+    );
   } catch {
-    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -35,24 +53,40 @@ const updateTournamentSchema = z.object({
   description: z.string().optional(),
   categoryId: z.string().min(1).optional(),
   subCategoryId: z.string().min(1).optional(),
-  startTime: z.string().transform((str) => new Date(str)).optional(),
-  windowOpenTime: z.string().transform((str) => new Date(str)).optional(),
+  startTime: z
+    .string()
+    .transform((str) => new Date(str))
+    .optional(),
+  windowOpenTime: z
+    .string()
+    .transform((str) => new Date(str))
+    .optional(),
   durationPerQ: z.number().min(5).optional(),
-  endTime: z.string().transform((str) => new Date(str)).optional(),
-  difficulty: z.enum(["EASY", "MEDIUM", "HARD","EXPERT"]).optional(),
+  endTime: z
+    .string()
+    .transform((str) => new Date(str))
+    .optional(),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD", "EXPERT"]).optional(),
   entryFee: z.number().min(0).optional(),
   prizePool: z.number().min(0).optional(),
   totalQuestions: z.number().min(1).optional(),
   totalSeats: z.number().min(2).optional(),
   winningSeats: z.number().min(0).optional(),
-  language: z.string().min(1,"Language Is Required!")
+  language: z.string().min(1, "Language Is Required!"),
+  prizes: z.array(z.number().min(1)).min(1, "There must be at least one prize"),
 });
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const admin = await checkAdmin();
     if (!admin) {
-      return NextResponse.json({ success: false, message: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const { id: tournamentId } = await params;
@@ -61,55 +95,86 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const validation = updateTournamentSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json({ success: false, message: "Validation Error", errors: validation.error.flatten().fieldErrors }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Validation Error",
+          errors: validation.error.flatten().fieldErrors,
+        },
+        { status: 400 }
+      );
     }
 
     const data = validation.data;
 
     if (data.startTime && data.windowOpenTime) {
       if (data.windowOpenTime >= data.startTime) {
-        return NextResponse.json({ success: false, message: "Window Open Time must be BEFORE Start Time" }, { status: 400 });
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Window Open Time must be BEFORE Start Time",
+          },
+          { status: 400 }
+        );
       }
     }
 
-    const currentTournament = await prisma.tournament.findUnique({ 
+    const currentTournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
-      include: { 
-        category: true, 
-        questions: { select: { id: true } } 
-      }
+      include: {
+        category: true,
+        questions: { select: { id: true } },
+      },
     });
 
     if (!currentTournament) {
-      return NextResponse.json({ success: false, message: "Tournament not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Tournament not found" },
+        { status: 404 }
+      );
     }
     const subCategory = await prisma.subCategory.findUnique({
-      where:{
-        id: data.subCategoryId
-      }
+      where: {
+        id: data.subCategoryId,
+      },
     });
     if (!subCategory) {
-      return NextResponse.json({ success: false, message: "Subcategory not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Subcategory not found" },
+        { status: 404 }
+      );
     }
     const finalTotalSeats = data.totalSeats ?? currentTournament.totalSeats;
-    const finalWinningSeats = data.winningSeats ?? currentTournament.winningSeats;
+    const finalWinningSeats =
+      data.winningSeats ?? currentTournament.winningSeats;
 
     if (finalWinningSeats >= finalTotalSeats) {
-        return NextResponse.json({ success: false, message: `Winning seats (${finalWinningSeats}) must be less than Total seats (${finalTotalSeats})` }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Winning seats (${finalWinningSeats}) must be less than Total seats (${finalTotalSeats})`,
+        },
+        { status: 400 }
+      );
     }
 
-    if (data.totalQuestions && data.totalQuestions !== currentTournament.questions.length) {
-      const difference = data.totalQuestions - currentTournament.questions.length;
+    if (
+      data.totalQuestions &&
+      data.totalQuestions !== currentTournament.questions.length
+    ) {
+      const difference =
+        data.totalQuestions - currentTournament.questions.length;
 
       if (difference > 0) {
         try {
           const newQuestions = await generateExactQuestions({
             title: data.title || currentTournament.title,
-            description: data.description || currentTournament.description || "",
+            description:
+              data.description || currentTournament.description || "",
             category: currentTournament.category.name,
             difficulty: data.difficulty || currentTournament.difficulty,
             count: difference,
-            language: data.language
+            language: data.language,
           });
 
           for (const q of newQuestions) {
@@ -122,16 +187,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             });
           }
         } catch {
-          return NextResponse.json({ success: false, message: "Failed to generate extra questions" }, { status: 500 });
+          return NextResponse.json(
+            { success: false, message: "Failed to generate extra questions" },
+            { status: 500 }
+          );
         }
-      } 
-      else if (difference < 0) {
+      } else if (difference < 0) {
         const countToRemove = Math.abs(difference);
-        const toRemove = currentTournament.questions.slice(-countToRemove).map(q => q.id);
+        const toRemove = currentTournament.questions
+          .slice(-countToRemove)
+          .map((q) => q.id);
         await prisma.question.deleteMany({ where: { id: { in: toRemove } } });
       }
     }
-    
+
     const updatedTournament = await prisma.tournament.update({
       where: { id: tournamentId },
       data: {
@@ -146,38 +215,68 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         difficulty: data.difficulty,
         entryFee: data.entryFee,
         prizePool: data.prizePool,
+        prizes: data.prizes,
         totalQuestions: data.totalQuestions,
         totalSeats: data.totalSeats,
         winningSeats: data.winningSeats,
       },
     });
 
-    return NextResponse.json({ success: true, message: "Tournament updated successfully", tournament: updatedTournament }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Tournament updated successfully",
+        tournament: updatedTournament,
+      },
+      { status: 200 }
+    );
   } catch {
-    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE( req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const admin = await checkAdmin();
     if (!admin) {
-      return NextResponse.json({ success: false, message: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const { id: tournamentId } = await params;
 
-    const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }});
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+    });
 
     if (!tournament) {
-      return NextResponse.json({ success: true, message: "Tournament not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: true, message: "Tournament not found" },
+        { status: 404 }
+      );
     }
 
-    await prisma.tournament.delete({ where: { id: tournamentId },include: {bots: true,questions: true,registration: true}});
+    await prisma.tournament.delete({
+      where: { id: tournamentId },
+      include: { bots: true, questions: true, registration: true },
+    });
 
-    return NextResponse.json({ success: true, message: "Tournament deleted successfully" }, { status: 200 });
-  } catch(error: any) {
-    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { success: true, message: "Tournament deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

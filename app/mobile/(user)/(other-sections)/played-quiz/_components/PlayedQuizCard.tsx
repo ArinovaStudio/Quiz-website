@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { Award } from "lucide-react";
+import Link from "next/link";
 
 interface QuizCardProps {
   event: any;
@@ -10,6 +11,7 @@ interface QuizCardProps {
 
 export default function PlayedQuizCard({ event, index = 0, getDate }: QuizCardProps) {
   return (
+    <Link href={`/mobile/join-quiz/${event.tournament.id}`}>
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
@@ -46,6 +48,7 @@ export default function PlayedQuizCard({ event, index = 0, getDate }: QuizCardPr
         )}
       </div>
     </motion.div>
+  </Link>
   );
 }
 export function PlayedQuizCardSkeleton({ index = 0 }) {

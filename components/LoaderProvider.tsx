@@ -40,10 +40,9 @@ export default function LoaderProvider({ children }: { children: React.ReactNode
           <Image
             unoptimized
             src={"/loading3.gif"}
-            height={200}
-            width={200}
+            height={150}
+            width={150}
             alt={"Loading"}
-            className="hue-rotate-[180deg]"
           />
         </div>
       )}

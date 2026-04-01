@@ -9,12 +9,14 @@ import { colorMap } from "@/lib/constants";
 import SpecialIcon from "@/components/SpecialIcon";
 import { ArrowLeft, Filter, Loader2 } from "lucide-react";
 import useGoBack from "@/components/GoBack";
-import useSWRInfinite from "swr/infinite";
 import { useInfiniteScroll } from "@/components/useInfiniteScroll";
 import { LANGUAGES } from "@/lib/constants";
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 export default function page() {
   const { id } = useParams();
-  const [filterOpen, setFilterOpen] = useState(false); 
+  const [filterOpen, setFilterOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const { data, isLoading, error } = useSWR(
     `/api/user/tournaments/${id}`,
@@ -23,14 +25,12 @@ export default function page() {
   );
   const filters = [
     { id: "all", label: "All Contests" },
-    { id: "high", label: "High Stakes (₹2L+)",type:"price" },
-    { id: "medium", label: "Medium (₹50K-₹2L)",type:"price" },
-    { id: "low", label: "Beginner (Under ₹50K)",type:"price" },
-    ...LANGUAGES.map((language)=>{
-        return {id: language,label: language,type: "language"}
-    })
+    { id: "high", label: "High Stakes (₹2L+)", type: "price" },
+    { id: "medium", label: "Medium (₹50K-₹2L)", type: "price" },
+    { id: "low", label: "Beginner (Under ₹50K)", type: "price" },
   ];
   const [isShrunk, setIsShrunk] = useState(false);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   useEffect(() => {
     const handleScroll = () => {
       const scrollValue = window.scrollY;
@@ -71,13 +71,17 @@ export default function page() {
       return recommendations.filter((event: any) => {
         return event.prizePool >= 200000;
       });
-    }else if(LANGUAGES.includes(selectedFilter)){
-      return recommendations.filter((event)=>{
-        return event.language === selectedFilter
-      });
     }
     return recommendations;
   }, [recommendations, selectedFilter]);
+  const languageBasedRecommendations = useMemo(() => {
+    if(selectedLanguages.length>0){
+    return filteredRecommendations.filter((recommendation)=>{
+      return selectedLanguages.includes(recommendation.language?.toUpperCase());
+    })
+  }
+    return filteredRecommendations;
+  }, [filteredRecommendations,selectedLanguages]);
   const item = !isLoading && data?.tournament;
   const goBack = useGoBack();
   return (
@@ -183,8 +187,27 @@ export default function page() {
         </div>
       </div>
       <div className="grid gap-4 mx-3">
-        <div className="uppercase text-sm sm:text-base md:text-2xl font-extrabold">
-          MORE CONTESTS ({filteredRecommendations?.length ?? 0})
+        <div className="uppercase flex justify-between items-center text-sm sm:text-base md:text-2xl font-extrabold">
+          CONTESTS ({languageBasedRecommendations?.length ?? 0})
+          <div className="flex gap-1">
+            {LANGUAGES.map((language) => {
+              return (
+                <Pill
+                  key={language}
+                  value={language}
+                  selectedValues={selectedLanguages}
+                  addValue={() =>
+                    setSelectedLanguages((prev) => {
+                      if (prev.includes(language)) {
+                        return prev.filter((lang) => lang !== language);
+                      }
+                      return [...prev, language];
+                    })
+                  }
+                />
+              );
+            })}
+          </div>
         </div>
 
         <div className="grid gap-2">
@@ -193,24 +216,49 @@ export default function page() {
             loadingCard={QuizCardSkeleton}
             loadingCount={5}
             loading={recommendationsLoading}
-            dataLength={filteredRecommendations?.length}
+            dataLength={languageBasedRecommendations?.length}
             emptyMessage="No Related Tournaments Found!"
           >
-            {filteredRecommendations?.map(
+            {languageBasedRecommendations?.map(
               (quiz: any, index: number) =>
                 quiz.id !== item?.id && (
                   <QuizCard key={quiz.id} {...quiz} index={index} />
                 )
             )}
           </ErrorLoading>
-            {!isLoading && isValidating && (
-              <div className="w-full">
-                <Loader2 size={20} className="mx-auto animate-spin" />
-              </div>
-            )}
-            <div ref={observerRef} />
+          {!isLoading && isValidating && (
+            <div className="w-full">
+              <Loader2 size={20} className="mx-auto animate-spin" />
+            </div>
+          )}
+          <div ref={observerRef} />
         </div>
       </div>
     </div>
+  );
+}
+
+type PillProps = {
+  value: string;
+  selectedValues: string[];
+  addValue: () => void;
+};
+
+export function Pill({ value, selectedValues, addValue }: PillProps) {
+  const isSelected = selectedValues.includes(value);
+  return (
+    <button
+      type="button"
+      onClick={addValue}
+      className={cn(
+        "flex items-center gap-2 px-3 my-3 py-1 rounded-full border text-xs transition-all",
+        isSelected
+          ? "bg-primary text-primary-foreground border-primary"
+          : "bg-muted text-muted-foreground border-border"
+      )}
+    >
+      {isSelected && <Check className="w-4 h-4" />}
+      {value}
+    </button>
   );
 }

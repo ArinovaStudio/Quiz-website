@@ -25,6 +25,7 @@ export async function GET(
         endTime: true,
         entryFee: true,
         prizePool: true,
+        prizes: true,
         totalSeats: true,
         winningSeats: true,
         difficulty: true,
