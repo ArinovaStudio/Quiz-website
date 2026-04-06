@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: "OTP Sent Successfully" }, { status: 200 });
 
-  } catch {
+  } catch(error: any) {
     return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
   }
 }
