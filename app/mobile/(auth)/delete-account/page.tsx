@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "react-hot-toast";
+import Wrapper from "../../(user)/(other-sections)/_components/Wrapper";
 
 type Step = "verify" | "otp" | "delete";
 
@@ -82,12 +83,8 @@ export default function DeleteAccount() {
     (step === "otp" && !data.otp);
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center px-4 pb-6">
-      {/* 🔥 TOASTER */}
-      <Toaster position="top-center" />
-
-      {/* HEADER */}
-      <div
+    <Wrapper title="Delete Account">
+      {/* <div
         className="w-full max-w-md bg-[#FFDB58] border-b-[4px] border-black p-6 text-center"
         style={{ boxShadow: "0px 6px 0px #000" }}
       >
@@ -95,11 +92,11 @@ export default function DeleteAccount() {
         <p className="text-[12px] font-[800] text-black/70">
           This action cannot be undone
         </p>
-      </div>
+      </div> */}
 
       {/* CARD */}
       <Card
-        className="w-full max-w-md mt-6 border-[4px] border-black rounded-[16px]"
+        className="w-full max-w-sm mx-auto mt-6 border-[4px] border-black rounded-[16px]"
         style={{ boxShadow: "6px 6px 0px #000" }}
       >
         <CardContent className="p-6 space-y-5">
@@ -171,6 +168,6 @@ export default function DeleteAccount() {
           </Button>
         </CardContent>
       </Card>
-    </div>
+    </Wrapper>
   );
 }

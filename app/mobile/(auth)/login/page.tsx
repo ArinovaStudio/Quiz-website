@@ -149,6 +149,17 @@ export default function Login() {
               </Link>
             </p>
           </div>
+          <div className="text-center">
+            <p className="text-[13px] font-[700] text-black/70">
+              Delete Account?{" "}
+              <Link
+                href="/mobile/delete-account"
+                className="text-black font-[900] uppercase underline"
+              >
+                Delete Account
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

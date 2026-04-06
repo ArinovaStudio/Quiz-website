@@ -7,6 +7,7 @@ import {
   History,
   CreditCard,
   LogOut,
+  Trash2,
 } from "lucide-react";
 
 import MenuItemCard from "./_components/MenuItemCard";
@@ -55,6 +56,13 @@ export default function page() {
       link: "/mobile/withdraw",
       subtitle: null,
       color: "pink",
+    },
+    {
+      Icon: Trash2,
+      title: "Delete Account",
+      link: "/mobile/delete-account",
+      subtitle: null,
+      color: "danger",
     },
     {
       Icon: LogOut,

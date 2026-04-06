@@ -18,7 +18,8 @@ export const colorMap: any = {
   cyan: "bg-[#CFFAFE]",
   orange: "bg-[#FED7AA]",
   fuchsia: "bg-[#F5D0FE]",
-  emerald: "bg-[#A7F3D0]"
+  emerald: "bg-[#A7F3D0]",
+  danger: "bg-[#FCA5A5]"
 };
 export const SITE_NAME = "Olobix";
 
