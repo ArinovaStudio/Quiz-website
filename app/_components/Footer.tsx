@@ -21,7 +21,7 @@ const Footer = () => {
             <Link href={"/refund-policy"} className="text-background/70 hover:text-background font-bold text-sm uppercase">Refund Policy</Link> <span className="mx-2 text-background/70 max-md:hidden">|</span>
             <Link href={"/withdraw-policy"} className="text-background/70 hover:text-background font-bold text-sm uppercase">Widthdraw Policy</Link> <span className="mx-2 text-background/70 max-md:hidden">|</span>
             <Link href={"/gaming-policy"} className="text-background/70 hover:text-background font-bold text-sm uppercase">Responsible Gaming Policy</Link>
-
+            <Link href={"/mobile/delete-account"} className="text-background/70 hover:text-background font-bold text-sm uppercase">Delete Account</Link>
           </div>
         </div>
 

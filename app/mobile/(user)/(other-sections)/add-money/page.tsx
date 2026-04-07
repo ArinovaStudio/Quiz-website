@@ -42,56 +42,55 @@ export default function Page() {
   };
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    setPending(true);
-    try {
-      const req = await fetch("/api/user/add-money/request", {
-        method: "POST",
-        body: JSON.stringify({
-          amount: amount,
-        }),
-      });
-      const data = await req.json();
-      if (!data.success) {
-        alert(data.message);
-        return;
-      }
-      const isLoaded = await loadRazorpay();
-      if (!isLoaded) {
-        toast.error("Razorpay SDK failed");
-        return;
-      }
-      const { order, transactionId } = data;
-      console.log(order);
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: "INR",
-        order_id: order.id,
-        name: SITE_NAME,
-        description: "The tokens will be added once payment is done",
-        handler: async function (response: Response) {
-          console.log(response);
-          // const request = await fetch("/api/user/add-money", {
-          //   method: "POST",
-          //   body: JSON.stringify({
-          //     ...response,
-          //     transactionId: transactionId,
-          //   }),
-          // });
-          // const res = await request.json();
-          // if (!res.success) {
-          //   throw Error(res.message);
-          // }
-          // toast.success("Tokens Added Successfully!");
-        },
-      };
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (error: any) {
-      toast.error(error.message || "Error Occured!");
-    } finally {
-      setPending(false);
-    }
+    // setPending(true);
+    // try {
+    //   const req = await fetch("/api/user/add-money/request", {
+    //     method: "POST",
+    //     body: JSON.stringify({
+    //       amount: amount,
+    //     }),
+    //   });
+    //   const data = await req.json();
+    //   if (!data.success) {
+    //     alert(data.message);
+    //     return;
+    //   }
+    //   const isLoaded = await loadRazorpay();
+    //   if (!isLoaded) {
+    //     toast.error("Razorpay SDK failed");
+    //     return;
+    //   }
+    //   const { order, transactionId } = data;
+    //   const options = {
+    //     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+    //     amount: order.amount,
+    //     currency: "INR",
+    //     order_id: order.id,
+    //     name: SITE_NAME,
+    //     description: "The tokens will be added once payment is done",
+    //     handler: async function (response: Response) {
+    //       console.log(response);
+    //       // const request = await fetch("/api/user/add-money", {
+    //       //   method: "POST",
+    //       //   body: JSON.stringify({
+    //       //     ...response,
+    //       //     transactionId: transactionId,
+    //       //   }),
+    //       // });
+    //       // const res = await request.json();
+    //       // if (!res.success) {
+    //       //   throw Error(res.message);
+    //       // }
+    //       // toast.success("Tokens Added Successfully!");
+    //     },
+    //   };
+    //   const rzp = new window.Razorpay(options);
+    //   rzp.open();
+    // } catch (error: any) {
+    //   toast.error(error.message || "Error Occured!");
+    // } finally {
+    //   setPending(false);
+    // }
   };
   return (
     <Wrapper title="Add Money">
