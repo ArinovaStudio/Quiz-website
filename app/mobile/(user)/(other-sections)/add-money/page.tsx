@@ -5,7 +5,13 @@ import Wrapper from "../_components/Wrapper";
 import { CreditCard, Loader2, Plus, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-
+import { loadRazorpay } from "@/lib/razorpay";
+import { SITE_NAME } from "@/lib/constants";
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 export default function Page() {
   const [amount, setAmount] = useState("");
   const [pending, setPending] = useState(false);
@@ -38,17 +44,49 @@ export default function Page() {
     e.preventDefault();
     setPending(true);
     try {
-      const request = await fetch("/api/user/add-money", {
+      const req = await fetch("/api/user/add-money/request", {
         method: "POST",
         body: JSON.stringify({
-          money: amount,
+          amount: amount,
         }),
       });
-      const response = await request.json();
-      if (!response.success) {
-        throw Error(response.message);
+      const data = await req.json();
+      if (!data.success) {
+        alert(data.message);
+        return;
       }
-      toast.success(response.message);
+      const isLoaded = await loadRazorpay();
+      if (!isLoaded) {
+        toast.error("Razorpay SDK failed");
+        return;
+      }
+      const { order, transactionId } = data;
+      console.log(order);
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: "INR",
+        order_id: order.id,
+        name: SITE_NAME,
+        description: "The tokens will be added once payment is done",
+        handler: async function (response: Response) {
+          console.log(response);
+          // const request = await fetch("/api/user/add-money", {
+          //   method: "POST",
+          //   body: JSON.stringify({
+          //     ...response,
+          //     transactionId: transactionId,
+          //   }),
+          // });
+          // const res = await request.json();
+          // if (!res.success) {
+          //   throw Error(res.message);
+          // }
+          // toast.success("Tokens Added Successfully!");
+        },
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error: any) {
       toast.error(error.message || "Error Occured!");
     } finally {
@@ -133,12 +171,12 @@ export default function Page() {
           type="submit"
           disabled={pending || !canAdd}
           className={`w-full py-4 rounded-[14px] border-[4px] border-black uppercase font-[900] text-[18px] tracking-wide flex items-center justify-center gap-2 shadow-[6px_6px_0px_#000] ${
-            (canAdd && !pending)
+            canAdd && !pending
               ? "bg-[#6366F1] text-white"
               : "bg-gray-300 text-black/50 cursor-not-allowed"
           }`}
         >
-          {pending && <Loader2 size={20} className="animate-spin"/>}
+          {pending && <Loader2 size={20} className="animate-spin" />}
           <Plus className="w-6 h-6" />
           {canAdd ? `Add ₹${numAmount.toLocaleString()}` : "Enter amount"}
         </motion.button>

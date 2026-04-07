@@ -1,7 +1,5 @@
 import Link from "@/components/AppLink";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { colorMap } from "@/lib/constants";
-import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 export interface Category {
   id: string | null;
@@ -16,13 +14,14 @@ interface CategoryCardProps {
   category: Category;
   selected?: boolean;
   onClick?: () => void;
+  isInside?: boolean
 }
 
 export default function CategoryCard({
   redirectBase,
   color,
   category,
-  onClick,
+  onClick
 }: CategoryCardProps) {
   const { name, image, tournamentsSize } = category;
 
@@ -53,7 +52,7 @@ export default function CategoryCard({
          }}
        >
          {/* Avatar */}
-         <div className="relative w-full h-22 rounded-b-lg overflow-hidden">
+         <div className={`relative w-full h-30 rounded-b-lg overflow-hidden`}>
            <Image
              src={category.image || "/sports.png"}
              className="object-cover"
@@ -63,7 +62,7 @@ export default function CategoryCard({
          </div>
    
          {/* Event Count */}
-         <div className="absolute bottom-7 sm:bottom-8 left-1">
+         <div className={`absolute left-1 bottom-5`}>
            <p
              className={`
                text-[10px]
@@ -104,5 +103,44 @@ export default function CategoryCard({
          </div>
        </button>
     </Link>
+  );
+}
+
+import { Skeleton } from "@/components/ui/skeleton";
+
+export function CategoryCardSkeleton() {
+  return (
+    <div className="w-full">
+      <div
+        className="
+          flex-shrink-0
+          w-full h-full
+          rounded-lg
+          border-[3px]
+          border-foreground
+          overflow-hidden
+          relative
+          pb-1
+        "
+        style={{
+          boxShadow: "5px 5px 0px #000000",
+        }}
+      >
+        {/* Image Skeleton */}
+        <div className="relative w-full h-30 rounded-b-lg overflow-hidden">
+          <Skeleton className="bg-gray-200 w-full h-full" />
+        </div>
+
+        {/* Event Count Skeleton */}
+        <div className="absolute left-1 bottom-5">
+          <Skeleton className="bg-gray-300 h-4 w-6 rounded-full" />
+        </div>
+
+        {/* Event Name Skeleton */}
+        <div className="px-2 pt-[5px] pb-1">
+          <Skeleton className="bg-gray-200 h-3 w-3/4 mx-auto" />
+        </div>
+      </div>
+    </div>
   );
 }

@@ -90,7 +90,7 @@ export default function page() {
           <div className="flex w-full gap-3 md:gap-6 justify-start items-center">
             <div className="h-16 w-16 md:h-30 md:w-30 relative rounded-xl overflow-hidden border-4 md:border-5 border-black shadow-[3px_3px_0px_0px_black] md:shadow-[6px_6px_0px_0px_black]">
               <Avatar className="w-full h-full rounded-none bg-transparent">
-                <AvatarImage alt={"Loading"} src={"/trophfee.png"} />
+                <AvatarImage alt={"Loading"} src={"/phase-2.png"} />
                 <AvatarFallback className="bg-transparent uppercase font-bold text-base md:text-lg text-black">
                   <Suspense fallback={<SkeletonView />}>
                     <HandleLoading loading={isLoading || isValidating}>
