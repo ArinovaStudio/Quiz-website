@@ -9,7 +9,7 @@ const verificationSchema = z.object({
   email: z.string().min(1),
   password: z.string().optional(),
   otp: z.string().optional(),
-  step: z.enum(["verify", "otp", "delete"], "Step Is Invalid"),
+  step: z.enum(["credentials", "otp", "delete"], "Step Is Invalid"),
 });
 const EMAIL = process.env.EMAIL_USER!;
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!validation.success)
       throw Error(z.treeifyError(validation.error).errors[0]);
     const { email, password, step, otp } = validation.data;
-    if (step === "verify") {
+    if (step === "credentials") {
       const exist = await prisma.user.findUnique({
         where: {
           email: email,
