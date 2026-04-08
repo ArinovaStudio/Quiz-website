@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { checkUser } from "@/lib/checkAuth";
 import Razorpay from "razorpay";
 import { v4 } from "uuid";
-// const razorpay = new Razorpay({
-//   key_id: process.env.RAZORPAY_KEY_ID!,
-//   key_secret: process.env.RAZORPAY_KEY_SECRET!,
-// });
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
 const MINIMUM_BALANCE = 100;
 
 export async function POST(req: NextRequest) {
@@ -53,22 +53,22 @@ export async function POST(req: NextRequest) {
       receipt: shortReceipt,
     };
 
-    // const order = await razorpay.orders.create(orderOptions);
-    // const transaction = await prisma.transactionHistory.create({
-    //   data: {
-    //     walletId: wallet.id,
-    //     paymentId: order.id,
-    //     amount: numericAmount,
-    //     tokens: numericAmount,
-    //     status: "PENDING",
-    //   },
-    // });
+    const order = await razorpay.orders.create(orderOptions);
+    const transaction = await prisma.transactionHistory.create({
+      data: {
+        walletId: wallet.id,
+        paymentId: order.id,
+        amount: numericAmount,
+        tokens: numericAmount,
+        status: "PENDING",
+      },
+    });
 
-    // return NextResponse.json({
-    //   success: true,
-    //   order,
-    //   transactionId: transaction.id,
-    // });
+    return NextResponse.json({
+      success: true,
+      order,
+      transactionId: transaction.id,
+    });
     return NextResponse.json({
       success: true,
     });
