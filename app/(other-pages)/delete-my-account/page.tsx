@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "react-hot-toast";
-import Wrapper from "../../(user)/(other-sections)/_components/Wrapper";
+// import Wrapper from "../../(user)/(other-sections)/_components/Wrapper";
 
 type Step = "verify" | "otp" | "delete";
 
@@ -83,7 +83,7 @@ export default function DeleteAccount() {
     (step === "otp" && !data.otp);
 
   return (
-    <Wrapper title="Delete Account">
+    // <Wrapper title="Delete Account">
       {/* <div
         className="w-full max-w-md bg-[#FFDB58] border-b-[4px] border-black p-6 text-center"
         style={{ boxShadow: "0px 6px 0px #000" }}
@@ -168,6 +168,6 @@ export default function DeleteAccount() {
           </Button>
         </CardContent>
       </Card>
-    </Wrapper>
+      {/* </Wrapper> */}
   );
 }
