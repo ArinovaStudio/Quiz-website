@@ -40,8 +40,8 @@ export default function LoaderProvider({ children }: { children: React.ReactNode
           <Image
             unoptimized
             src={"/loading3.gif"}
-            height={150}
-            width={150}
+            height={64}
+            width={48}
             alt={"Loading"}
           />
         </div>
