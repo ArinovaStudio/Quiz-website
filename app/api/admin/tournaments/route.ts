@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-const tournamentSchema = z.object({
+const tournamentSchema = z.object({  
   title: z.string().min(3),
   description: z.string().optional(),
   categoryId: z.string().min(1, "Category is required"),
@@ -74,7 +74,7 @@ const tournamentSchema = z.object({
   winningSeats: z.number().min(0, "Cannot be negative"),
   prizes: z.array(z.number().min(1)).min(1,"There must be at least one prize")
 });
-
+ 
 export async function POST(req: NextRequest) {
   try {
     const admin = await checkAdmin();
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
         categoryId: category.id,
         startTime: data.startTime,
         subCategoryId: data.subCategoryId,
-        endTime: data.endTime,
+        endTime: data.endTime, 
         language: data.language,
         windowOpenTime: data.windowOpenTime,
         durationPerQ: data.durationPerQ,
