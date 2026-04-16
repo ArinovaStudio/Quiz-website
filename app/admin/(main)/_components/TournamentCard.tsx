@@ -3,18 +3,46 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BadgeIndianRupee, Calendar, Clock, Currency, Sofa, Ticket, Trophy } from "lucide-react";
+import {
+  BadgeIndianRupee,
+  Calendar,
+  Clock,
+  Currency,
+  Sofa,
+  Ticket,
+  Trophy,
+} from "lucide-react";
 import { WarningModal } from "@/components/WarningModal";
 import { difficultyColors } from "@/lib/constants";
-export default function TournamentCard({ tournament ,setEditOpen,setInitialData,handleDelete,loading}:{
-  tournament: any ;
+export default function TournamentCard({
+  tournament,
+  setEditOpen,
+  setInitialData,
+  handleDelete,
+  loading,
+}: {
+  tournament: any;
   setEditOpen: any;
   setInitialData: any;
   handleDelete: any;
-  loading: boolean
+  loading: boolean;
 }) {
-  const startTime = new Date(tournament?.startTime).toLocaleTimeString();
-  const startDate = new Date(tournament?.startTime).toLocaleDateString("en-GB").replaceAll("/","-");
+  const iso = tournament?.startTime;
+
+  let startTime = "";
+  let startDate = "";
+
+  if (iso) {
+    const hours = parseInt(iso.slice(11, 13));
+    const minutes = iso.slice(14, 16);
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+
+    startTime = `${formattedHours}:${minutes} ${ampm}`;
+
+    startDate = `${iso.slice(8, 10)}-${iso.slice(5, 7)}-${iso.slice(0, 4)}`;
+  }
   return (
     <Card className="rounded-xl w-full py-2 shadow-sm hover:shadow-md transition">
       <CardContent className="p-5 space-y-4">
@@ -22,11 +50,15 @@ export default function TournamentCard({ tournament ,setEditOpen,setInitialData,
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold">{tournament.title}</h3>
-            <Badge className={`${difficultyColors[tournament?.difficulty]}`}>{tournament.difficulty}</Badge>
+            <Badge className={`${difficultyColors[tournament?.difficulty]}`}>
+              {tournament.difficulty}
+            </Badge>
           </div>
 
           <Badge
-            className={`animate-pulse ${tournament.status==="LIVE" && "bg-green-500"}`}
+            className={`animate-pulse ${
+              tournament.status === "LIVE" && "bg-green-500"
+            }`}
             variant={
               tournament.status === "LIVE"
                 ? "default"
@@ -92,13 +124,24 @@ export default function TournamentCard({ tournament ,setEditOpen,setInitialData,
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">
-          <Button variant="default" className="flex-1" onClick={()=>{setInitialData(tournament);setEditOpen(true)}}>
+          <Button
+            variant="default"
+            className="flex-1"
+            onClick={() => {
+              setInitialData(tournament);
+              setEditOpen(true);
+            }}
+          >
             Edit
           </Button>
-          <WarningModal disabled={loading} onConfirm={handleDelete} variant="destructive">
-          <Button variant="outline" className="flex-1 text-red-500!">
-            Delete
-          </Button>
+          <WarningModal
+            disabled={loading}
+            onConfirm={handleDelete}
+            variant="destructive"
+          >
+            <Button variant="outline" className="flex-1 text-red-500!">
+              Delete
+            </Button>
           </WarningModal>
         </div>
       </CardContent>

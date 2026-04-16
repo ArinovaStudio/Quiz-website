@@ -100,14 +100,7 @@ const inputFields = [
 
 const formatDateTimeLocal = (dateString?: string) => {
   if (!dateString) return "";
-
-  const date = new Date(dateString);
-
-  const parts = date.toLocaleString("sv-SE", {
-    timeZone: "Asia/Kolkata",
-  });
-
-  return parts.replace(" ", "T").slice(0, 16);
+  return dateString.slice(0, 16);
 };
 export default function TournamentModal({
   open,
