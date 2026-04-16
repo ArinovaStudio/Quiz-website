@@ -21,7 +21,7 @@ export default function page() {
   const banners = data?.data ?? [];
   const [pending, setPending] = useState(false);
   const handleUpsert = async (data: Banner, mode: "create" | "edit") => {
-    console.log(data,mode);
+    // console.log(data,mode);
     try {
       setPending(true);
       const url = "/api/banner/" + (mode === "create" ? "" : data.id);

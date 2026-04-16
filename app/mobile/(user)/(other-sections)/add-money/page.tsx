@@ -69,7 +69,7 @@ export default function Page() {
         name: SITE_NAME,
         description: "The tokens will be added once payment is done",
         handler: async function (response: Response) {
-          console.log(response);
+          // console.log(response);
           // const request = await fetch("/api/user/add-money", {
           //   method: "POST",
           //   body: JSON.stringify({

@@ -43,8 +43,24 @@ export default function TournamentEndModal({
 
     return () => clearInterval(interval)
   }, [open, router, redirectTo])
-  const endDate = (new Date(endDateTime)).toLocaleDateString().replaceAll("/","-");
-  const endTime = (new Date(endDateTime)).toLocaleTimeString();
+  // const endDate = (new Date(endDateTime)).toLocaleDateString().replaceAll("/","-");
+  // const endTime = (new Date(endDateTime)).toLocaleTimeString();
+  const iso = endDateTime;
+
+  let endTime = "";
+  let endDate = "";
+
+  if (iso) {
+    const hours = parseInt(iso.slice(11, 13));
+    const minutes = iso.slice(14, 16);
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+
+    endTime = `${formattedHours}:${minutes} ${ampm}`;
+
+    endDate = `${iso.slice(8, 10)}-${iso.slice(5, 7)}-${iso.slice(0, 4)}`;
+  }
   return (
     <Dialog open={open}>
       <DialogContent className="sm:max-w-[480px] rounded-2xl [&>button]:hidden">

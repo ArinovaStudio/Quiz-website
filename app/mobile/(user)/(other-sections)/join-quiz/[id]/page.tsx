@@ -103,8 +103,22 @@ export default function Page() {
       setPending(false);
     }
   };
-  const startDate = new Date(tournament?.startTime).toDateString();
-  const startTime = new Date(tournament?.startTime).toLocaleTimeString();
+  const iso = tournament?.startTime;
+
+  let startTime = "";
+  let startDate = "";
+
+  if (iso) {
+    const hours = parseInt(iso.slice(11, 13));
+    const minutes = iso.slice(14, 16);
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+
+    startTime = `${formattedHours}:${minutes} ${ampm}`;
+
+    startDate = `${iso.slice(8, 10)}-${iso.slice(5, 7)}-${iso.slice(0, 4)}`;
+  }
   switch (tournamentStatus) {
     case "DRAFT":
       buttonLabel = "⏳ Contest hasn't started yet";

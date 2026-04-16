@@ -109,7 +109,7 @@ export default function TournamentModal({
   initialData,
   onSubmit,
 }: Props) {
-  console.log(initialData);
+  // console.log(initialData);
   const { data, isLoading } = useSWR("/api/categories", fetcher);
 
   const [formData, setFormData] = useState<TournamentFormValues>(defaultValues);
