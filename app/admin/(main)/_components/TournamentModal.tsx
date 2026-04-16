@@ -103,9 +103,11 @@ const formatDateTimeLocal = (dateString?: string) => {
 
   const date = new Date(dateString);
 
-  const pad = (n: number) => n.toString().padStart(2, "0");
+  const parts = date.toLocaleString("sv-SE", {
+    timeZone: "Asia/Kolkata",
+  });
 
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return parts.replace(" ", "T").slice(0, 16);
 };
 export default function TournamentModal({
   open,
@@ -114,6 +116,7 @@ export default function TournamentModal({
   initialData,
   onSubmit,
 }: Props) {
+  console.log(initialData);
   const { data, isLoading } = useSWR("/api/categories", fetcher);
 
   const [formData, setFormData] = useState<TournamentFormValues>(defaultValues);

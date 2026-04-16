@@ -8,13 +8,16 @@ export async function GET(req: NextRequest) {
   try {
     const admin = await checkAdmin();
     if (!admin) {
-      return NextResponse.json({ success: false, message: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search");
     const difficulty = searchParams.get("difficulty");
-    const categoryId = searchParams.get("categoryId"); 
+    const categoryId = searchParams.get("categoryId");
     const status = searchParams.get("status");
 
     const whereClause: any = {};
@@ -35,80 +38,129 @@ export async function GET(req: NextRequest) {
     }
 
     const tournaments = await prisma.tournament.findMany({
-        where: whereClause,
-        orderBy: { createdAt: "desc" },
-        include: {
-            category: true,
-            subCategory: true
-        }
+      where: whereClause,
+      orderBy: { createdAt: "desc" },
+      include: {
+        category: true,
+        subCategory: true,
+      },
     });
-    let filteredResults = tournaments.map((tournament)=>({
+    let filteredResults = tournaments.map((tournament) => ({
       ...tournament,
-      status: getTournamentStatus(tournament)
+      status: getTournamentStatus(tournament),
     }));
-    if(status){
-      filteredResults = filteredResults.filter((tournament)=>tournament.status===status);
+    if (status) {
+      filteredResults = filteredResults.filter(
+        (tournament) => tournament.status === status
+      );
     }
-    return NextResponse.json({ success: true, count: tournaments.length, tournaments:filteredResults }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        count: tournaments.length,
+        tournaments: filteredResults,
+      },
+      { status: 200 }
+    );
   } catch {
-    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
-const tournamentSchema = z.object({  
+const tournamentSchema = z.object({
   title: z.string().min(3),
   description: z.string().optional(),
   categoryId: z.string().min(1, "Category is required"),
   subCategoryId: z.string().min(1, "SubCategory is required"),
-  startTime: z.string().transform((str) => new Date(str)),
-  endTime: z.string().transform((str) => new Date(str)),
-  windowOpenTime: z.string().transform((str) => new Date(str)),
+  startTime: z.string().min(1),
+  endTime: z.string().min(1),
+  windowOpenTime: z.string().min(1),
   durationPerQ: z.number().min(5),
   totalQuestions: z.number().min(1),
-  difficulty: z.enum(["EASY", "MEDIUM", "HARD","EXPERT"]),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD", "EXPERT"]),
   entryFee: z.number().min(0),
   prizePool: z.number().min(0),
-  language: z.string().min(1,"Language Is Required!"),
+  language: z.string().min(1, "Language Is Required!"),
   totalSeats: z.number().min(2, "Must have at least 2 seats"),
   winningSeats: z.number().min(0, "Cannot be negative"),
-  prizes: z.array(z.number().min(1)).min(1,"There must be at least one prize")
+  prizes: z.array(z.number().min(1)).min(1, "There must be at least one prize"),
 });
- 
+
 export async function POST(req: NextRequest) {
   try {
     const admin = await checkAdmin();
     if (!admin) {
-      return NextResponse.json({ success: false, message: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();
     const validation = tournamentSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json({ success: false, message: "Validation Error", errors: validation.error.flatten().fieldErrors }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Validation Error",
+          errors: validation.error.flatten().fieldErrors,
+        },
+        { status: 400 }
+      );
     }
 
     const data = validation.data;
+
+    const startTime = new Date(data.startTime);
+    const windowOpenTime = new Date(data.windowOpenTime);
+    const endTime = new Date(data.endTime);
+
     const category = await prisma.category.findUnique({
-        where: { id: data.categoryId }
+      where: { id: data.categoryId },
     });
 
     if (!category) {
-        return NextResponse.json({ success: false, message: "Invalid Category ID" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Invalid Category ID" },
+        { status: 400 }
+      );
     }
 
-    const checkTitle = await prisma.tournament.findFirst({ where: { title: data.title } });
+    const checkTitle = await prisma.tournament.findFirst({
+      where: { title: data.title },
+    });
     if (checkTitle) {
-      return NextResponse.json({ success: false, message: "Tournament with this title already exists" }, { status: 409 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Tournament with this title already exists",
+        },
+        { status: 409 }
+      );
     }
 
     if (data.windowOpenTime >= data.startTime) {
-      return NextResponse.json({ success: false, message: "Window Open Time must be BEFORE Start Time" }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Window Open Time must be BEFORE Start Time",
+        },
+        { status: 400 }
+      );
     }
 
     if (data.winningSeats >= data.totalSeats) {
-       return NextResponse.json({ success: false, message: "Winning seats must be less than Total seats" }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Winning seats must be less than Total seats",
+        },
+        { status: 400 }
+      );
     }
 
     let generatedQuestions;
@@ -119,10 +171,13 @@ export async function POST(req: NextRequest) {
         category: category.name,
         difficulty: data.difficulty,
         count: data.totalQuestions,
-        language: data.language
+        language: data.language,
       });
     } catch (error: any) {
-      return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      return NextResponse.json(
+        { success: false, message: error.message },
+        { status: 500 }
+      );
     }
 
     const tournament = await prisma.tournament.create({
@@ -130,11 +185,11 @@ export async function POST(req: NextRequest) {
         title: data.title,
         description: data.description,
         categoryId: category.id,
-        startTime: data.startTime,
+        startTime: startTime,
         subCategoryId: data.subCategoryId,
-        endTime: data.endTime, 
+        endTime: endTime,
         language: data.language,
-        windowOpenTime: data.windowOpenTime,
+        windowOpenTime: windowOpenTime,
         durationPerQ: data.durationPerQ,
         totalQuestions: data.totalQuestions,
         difficulty: data.difficulty,
@@ -147,16 +202,25 @@ export async function POST(req: NextRequest) {
           create: generatedQuestions.map((q: any) => ({
             text: q.text,
             options: {
-              create: q.options
-            }
-          }))
-        }
+              create: q.options,
+            },
+          })),
+        },
       },
     });
 
-    return NextResponse.json({ success: true, message: "Tournament Created Successfully", id: tournament.id }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Tournament Created Successfully",
+        id: tournament.id,
+      },
+      { status: 201 }
+    );
   } catch {
-    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

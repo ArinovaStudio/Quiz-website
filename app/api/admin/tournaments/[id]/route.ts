@@ -55,16 +55,16 @@ const updateTournamentSchema = z.object({
   subCategoryId: z.string().min(1).optional(),
   startTime: z
     .string()
-    .transform((str) => new Date(str))
+    .min(1)
     .optional(),
   windowOpenTime: z
     .string()
-    .transform((str) => new Date(str))
+    .min(1)
     .optional(),
   durationPerQ: z.number().min(5).optional(),
   endTime: z
     .string()
-    .transform((str) => new Date(str))
+    .min(1)
     .optional(),
   difficulty: z.enum(["EASY", "MEDIUM", "HARD", "EXPERT"]).optional(),
   entryFee: z.number().min(0).optional(),
@@ -91,7 +91,6 @@ export async function PUT(
 
     const { id: tournamentId } = await params;
     const body = await req.json();
-
     const validation = updateTournamentSchema.safeParse(body);
 
     if (!validation.success) {
@@ -106,9 +105,13 @@ export async function PUT(
     }
 
     const data = validation.data;
-
-    if (data.startTime && data.windowOpenTime) {
-      if (data.windowOpenTime >= data.startTime) {
+    const startTime = data.startTime ? new Date(data.startTime) : undefined;
+    const windowOpenTime = data.windowOpenTime
+      ? new Date(data.windowOpenTime)
+      : undefined;
+    const endTime = data.endTime ? new Date(data.endTime) : undefined;
+    if (startTime && windowOpenTime) {
+      if (windowOpenTime >= startTime) {
         return NextResponse.json(
           {
             success: false,
@@ -118,7 +121,6 @@ export async function PUT(
         );
       }
     }
-
     const currentTournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
       include: {
@@ -208,9 +210,9 @@ export async function PUT(
         description: data.description,
         categoryId: data.categoryId,
         subCategoryId: data.subCategoryId,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        windowOpenTime: data.windowOpenTime,
+        startTime: startTime,
+        endTime: endTime,
+        windowOpenTime: windowOpenTime,
         durationPerQ: data.durationPerQ,
         difficulty: data.difficulty,
         entryFee: data.entryFee,
